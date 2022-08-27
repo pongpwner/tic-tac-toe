@@ -67,25 +67,28 @@ let Player = (marker) => {
 let GameLogic = (() => {
   let _turnCount = 0;
   let _currentPlayer = "X";
+  let _gameOver = false;
 
   //sets tile to x or o upon click
   let claimTile = (id) => {
-    console.log("sssssssssssssss");
     //set gameboard
     GameBoard.setGameBoard(id, { class: _currentPlayer });
     //GameBoard._gameBoard[id] = { class: _currentPlayer };
-    console.log(GameBoard._gameBoard[id]);
+    console.log("Current tile:" + GameBoard.getGameBoard()[id].class);
+    console.log("current player" + _currentPlayer);
     setCurrentPlayer();
-    console.log(_currentPlayer);
-    console.log(_turnCount);
+
+    //console.log(_turnCount);
     _turnCount++;
 
     GameBoard.updateDom();
     //game over checks
-    checkHorizontal();
-    checkVertical();
-    checkDiagonal();
-    if (_turnCount === 9) {
+    if (!_gameOver) {
+      checkHorizontal();
+      checkVertical();
+      checkDiagonal();
+    }
+    if (_turnCount === 9 && _gameOver === false) {
       gameEnd("tie");
     }
   };
@@ -108,12 +111,13 @@ let GameLogic = (() => {
   //game over checks
 
   let checkHorizontal = () => {
-    console.log(GameBoard.getGameBoard());
+    //console.log(GameBoard.getGameBoard());
     //top row
     let tempArr = [];
     for (let i = 0; i < 3; i++) {
+      console.log(GameBoard.getGameBoard()[i]);
       tempArr.push(
-        GameBoard._gameBoard[i] ? GameBoard._gameBoard[i].class : "l"
+        GameBoard.getGameBoard()[i] ? GameBoard._gameBoard[i].class : "l"
       );
     }
     let flatString = tempArr.join("");
@@ -127,7 +131,7 @@ let GameLogic = (() => {
     /// middle row
     for (let i = 3; i < 6; i++) {
       tempArr.push(
-        GameBoard._gameBoard[i] ? GameBoard._gameBoard[i].class : "l"
+        GameBoard.getGameBoard()[i] ? GameBoard._gameBoard[i].class : "l"
       );
     }
     flatString = tempArr.join("");
@@ -141,7 +145,7 @@ let GameLogic = (() => {
     //botttom row
     for (let i = 6; i < 9; i++) {
       tempArr.push(
-        GameBoard._gameBoard[i] ? GameBoard._gameBoard[i].class : "l"
+        GameBoard.getGameBoard()[i] ? GameBoard._gameBoard[i].class : "l"
       );
     }
     flatString = tempArr.join("");
@@ -160,7 +164,7 @@ let GameLogic = (() => {
     let tempArr = [];
     for (let i = 0; i < GameBoard._gameBoard.length; i += 3) {
       tempArr.push(
-        GameBoard._gameBoard[i] ? GameBoard._gameBoard[i].class : "l"
+        GameBoard.getGameBoard()[i] ? GameBoard._gameBoard[i].class : "l"
       );
     }
     let flatString = tempArr.join("");
@@ -176,7 +180,7 @@ let GameLogic = (() => {
     tempArr = [];
     for (let i = 1; i < GameBoard._gameBoard.length; i += 3) {
       tempArr.push(
-        GameBoard._gameBoard[i] ? GameBoard._gameBoard[i].class : "l"
+        GameBoard.getGameBoard()[i] ? GameBoard._gameBoard[i].class : "l"
       );
     }
     flatString = tempArr.join("");
@@ -192,7 +196,7 @@ let GameLogic = (() => {
     tempArr = [];
     for (let i = 2; i < GameBoard._gameBoard.length; i += 3) {
       tempArr.push(
-        GameBoard._gameBoard[i] ? GameBoard._gameBoard[i].class : "l"
+        GameBoard.getGameBoard()[i] ? GameBoard._gameBoard[i].class : "l"
       );
     }
     flatString = tempArr.join("");
@@ -211,10 +215,11 @@ let GameLogic = (() => {
     let tempArr = [];
     for (let i = 0; i < GameBoard._gameBoard.length; i += 4) {
       tempArr.push(
-        GameBoard._gameBoard[i] ? GameBoard._gameBoard[i].class : "l"
+        GameBoard.getGameBoard()[i] ? GameBoard._gameBoard[i].class : "l"
       );
     }
     let flatString = tempArr.join("");
+    //onsole.log("diagonal" + flatString);
     if (flatString === "XXX") {
       gameEnd("X");
     }
@@ -226,7 +231,7 @@ let GameLogic = (() => {
     tempArr = [];
     for (let i = 2; i < 7; i += 2) {
       tempArr.push(
-        GameBoard._gameBoard[i] ? GameBoard._gameBoard[i].class : "l"
+        GameBoard.getGameBoard()[i] ? GameBoard._gameBoard[i].class : "l"
       );
     }
     flatString = tempArr.join("");
@@ -249,6 +254,7 @@ let GameLogic = (() => {
       console.log(GameBoard.getGameBoard());
       body.removeChild(gameEndContainer);
       GameBoard.updateDom();
+      window.location.reload();
     };
     // container
     let gameEndContainer = document.createElement("div");
@@ -256,10 +262,12 @@ let GameLogic = (() => {
     //winner
     let winner = document.createElement("div");
     winner.classList.add("winner");
-    if (winner === "tie") {
+    if (result === "tie") {
       winner.textContent = `It's a ${result}!`;
+      _gameOver = true;
     } else {
       winner.textContent = `${result} is the winner!`;
+      _gameOver = true;
     }
     gameEndContainer.appendChild(winner);
     //reset button
